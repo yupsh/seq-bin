@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/urfave/cli/v2"
 
-	yup "github.com/gloo-foo/framework"
+	gloo "github.com/gloo-foo/framework"
 	. "github.com/yupsh/seq"
 )
 
@@ -54,9 +55,13 @@ func main() {
 func action(c *cli.Context) error {
 	var params []any
 
-	// Add all arguments
+	// Add all arguments - convert strings to float64
 	for i := 0; i < c.NArg(); i++ {
-		params = append(params, c.Args().Get(i))
+		val, err := strconv.ParseFloat(c.Args().Get(i), 64)
+		if err != nil {
+			return fmt.Errorf("invalid number: %s", c.Args().Get(i))
+		}
+		params = append(params, val)
 	}
 
 	// Add flags based on CLI options
@@ -72,5 +77,5 @@ func action(c *cli.Context) error {
 
 	// Create and execute the seq command
 	cmd := Seq(params...)
-	return yup.Run(cmd)
+	return gloo.Run(cmd)
 }
